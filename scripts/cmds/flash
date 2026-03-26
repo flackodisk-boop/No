@@ -1,0 +1,101 @@
+const axios = require("axios");
+
+const CREATOR_ID = "ID_CELESTIN_OLUA"; // Remplacer par le vrai userID
+const memory = {};
+const moods = {};
+const moodList = ["fun", "cool", "froid", "sarcastique", "énergique"];
+const lastMoodChange = {};
+
+function normalizeText(text) {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
+function frameMessage(content) {
+  return `✧═════•❁❀❁•═════✧\n${content}\n✧═════•❁❀❁•═════✧`;
+}
+
+module.exports = {
+  config: {
+    name: "flash",
+    version: "3.0",
+    author: "Célestin Olua",
+    role: 0,
+    category: "ai",
+    shortDescription: "Flash V3 : Chat + Images + Mémoire + Humeur",
+    guide: "{pn} [message] | imagine | clear"
+  },
+
+  onStart: async function({ message }) {
+    await message.reply(frameMessage("⚡ Flash V3 est prêt ! Tapez 'flash [message]' pour parler ou 'flash imagine [prompt]' pour créer une image !"));
+  },
+
+  onChat: async function({ event, message, usersData }) {
+    const userID = event.senderID;
+    const userName = await usersData.getName(userID);
+    const userMsg = event.body?.trim();
+    if (!userMsg) return;
+
+    const text = normalizeText(userMsg);
+
+    // Répond uniquement si : créateur OU message commence par "flash"
+    if (userID !== CREATOR_ID && !text.startsWith("flash")) return;
+
+    const args = userMsg.split(" ");
+    const command = args[1]?.toLowerCase();
+
+    // 🔹 Clear mémoire
+    if (command === "clear" && userID === CREATOR_ID) {
+      memory[userID] = "";
+      return message.reply(frameMessage("🧹 Mémoire reset !"));
+    }
+
+    // 🔹 Génération d'image
+    if (command === "imagine" && userID === CREATOR_ID) {
+      const promptImg = args.slice(2).join(" ");
+      if (!promptImg) return message.reply(frameMessage("❌ Exemple : flash imagine un dragon sur une moto 🚀"));
+      try {
+        const res = await axios.get(`https://arychauhann.onrender.com/api/gemini-proxy2?prompt=${encodeURIComponent(promptImg)}`);
+        const imgUrl = res.data.image || res.data.url || null;
+        if (!imgUrl) return message.reply(frameMessage("❌ L'API n'a pas renvoyé d'image"));
+        return message.reply(frameMessage(`🖼️ Voici ton image :\n${imgUrl}`));
+      } catch {
+        return message.reply(frameMessage("❌ Erreur API image 😢"));
+      }
+    }
+
+    // 🔹 Gestion de l'humeur
+    const now = Date.now();
+    if (!moods[userID]) {
+      moods[userID] = moodList[Math.floor(Math.random() * moodList.length)];
+      lastMoodChange[userID] = now;
+    }
+    if (now - lastMoodChange[userID] > 120000) {
+      moods[userID] = moodList[Math.floor(Math.random() * moodList.length)];
+      lastMoodChange[userID] = now;
+    }
+    const mood = moods[userID];
+
+    // 🔹 Chat intelligent
+    const userPrompt = args.slice(1).join(" ");
+    const memoryText = memory[userID] || "";
+
+    const prompt = `
+Tu es Flash V3 🤖, IA ultra-rapide et intelligente.
+🎭 Humeur : ${mood}
+👑 Créateur : Célestin Olua
+🧠 Mémoire précédente : ${memoryText}
+👤 Utilisateur : ${userName}
+💬 Message : ${userPrompt}
+Règles : répond de façon intelligente, créative, vivante, drôle, utilise des emojis, adapte ton ton selon ton humeur.
+`;
+
+    try {
+      const res = await axios.get(`'https://christus-api.vercel.app/ai/gemini-proxy2?prompt=';=${encodeURIComponent(prompt)}`);
+      const reply = res.data.reply || res.data.result || "❌ Flash V3 ne comprend pas 😢";
+      memory[userID] = reply;
+      return message.reply(frameMessage(reply));
+    } catch {
+      return message.reply(frameMessage("❌ Flash V3 bug 😢"));
+    }
+  }
+};
