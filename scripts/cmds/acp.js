@@ -4,15 +4,15 @@ module.exports = {
   config: {
     name: "accept",
     aliases: ["acp"],
-    version: "1.0",
+    version: "1.0 🌙⚽👑",
     author: "Christus",
     countDown: 8,
     role: 2,
-    shortDescription: "gérer les demandes d'amis",
+    shortDescription: "Gérer les demandes d'amis à la mode Royale Football",
     longDescription: "Accepter ou refuser les demandes d'amis",
     category: "utility",
     guide: {
-      en: "{pn} [add|del] [numéro|all]"
+      fr: "{pn} [add|del] [numéro|all]"
     }
   },
 
@@ -41,11 +41,11 @@ module.exports = {
     if (args[0] === "add") {
       form.fb_api_req_friendly_name = "FriendingCometFriendRequestConfirmMutation";
       form.doc_id = "3147613905362928";
-      actionType = "Acceptée";
+      actionType = "✅ Acceptée Royale";
     } else if (args[0] === "del") {
       form.fb_api_req_friendly_name = "FriendingCometFriendRequestDeleteMutation";
       form.doc_id = "4108254489275063";
-      actionType = "Refusée";
+      actionType = "❌ Refusée Royale";
     } else {
       return api.sendMessage("❌ Commande invalide. Utilisation : <add|del> <numéro|all>", event.threadID, event.messageID);
     }
@@ -78,9 +78,9 @@ module.exports = {
     results.forEach((result, index) => {
       const user = newTargetIDs[index];
       if (result.status === "fulfilled" && !JSON.parse(result.value).errors) {
-        success.push(`✅ ${actionType} avec succès : ${user.node.name} (${user.node.id})`);
+        success.push(`${actionType} : ${user.node.name} (${user.node.id})`);
       } else {
-        failed.push(`❌ Échec : ${user.node.name} (${user.node.id})`);
+        failed.push(`❌ Échec Royale : ${user.node.name} (${user.node.id})`);
       }
     });
 
@@ -108,10 +108,10 @@ module.exports = {
       const listRequest = JSON.parse(response).data.viewer.friending_possibilities.edges;
 
       if (!listRequest || listRequest.length === 0) {
-        return api.sendMessage("🌟 Vous n'avez aucune demande d'ami en attente !", event.threadID);
+        return api.sendMessage("🌟 Vous n'avez aucune demande d'ami en attente Royale ! ⚽👑", event.threadID);
       }
 
-      let msg = "╔═══》 𝐃𝐞𝐦𝐚𝐧𝐝𝐞𝐬 𝐝'𝐚𝐦𝐢𝐬 《 ═══╗\n\n";
+      let msg = "╔═══》 𝐃𝐞𝐦𝐚𝐧𝐝𝐞𝐬 𝐝'𝐚𝐦𝐢𝐬 🌙⚽👑 《 ═══╗\n\n";
       listRequest.forEach((user, index) => {
         msg += `💠  No. ${index + 1}\n`;
         msg += `👤 Nom: ${user.node.name}\n`;
@@ -121,10 +121,10 @@ module.exports = {
       });
 
       msg += "\n💡 Répondez avec :\n";
-      msg += "✅ add <numéro> — Accepter la demande\n";
-      msg += "❌ del <numéro> — Refuser la demande\n";
-      msg += "💫 add all — Tout accepter\n";
-      msg += "🔥 del all — Tout refuser\n\n";
+      msg += "✅ add <numéro> — Accepter la demande Royale\n";
+      msg += "❌ del <numéro> — Refuser la demande Royale\n";
+      msg += "💫 add all — Tout accepter Royale\n";
+      msg += "🔥 del all — Tout refuser Royale\n\n";
       msg += "⏳ Ce menu sera supprimé automatiquement dans 2 minutes.\n";
       msg += "╚═══════════════════╝";
 
@@ -142,7 +142,7 @@ module.exports = {
 
     } catch (error) {
       console.error(error);
-      api.sendMessage("❌ Une erreur est survenue lors de la récupération des demandes d'amis.", event.threadID);
+      api.sendMessage("❌ Une erreur Royale est survenue lors de la récupération des demandes d'amis.", event.threadID);
     }
   }
 };
