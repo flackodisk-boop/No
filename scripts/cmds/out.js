@@ -2,27 +2,28 @@ module.exports = {
   config: {
     name: "out",
     aliases: ["leave"],
-    version: "1.0",
+    version: "1.0 🌙⚽👑",
     author: "Christus",
     countDown: 5,
     role: 3,
     shortDescription: {
-      en: "Le bot quitte le groupe",
+      fr: "Le bot quitte le groupe avec style royal",
     },
     category: "owner",
     guide: {
-      en: "{pn} — Faire quitter le bot de ce groupe"
+      fr: "{pn} — Faire quitter le bot de ce groupe"
     }
   },
 
   onStart: async function ({ api, event }) {
     try {
-
+      // Message de départ royal
       await api.sendMessage(
-        "😢 D'accord, je quitte ce groupe...\n💌 Prenez soin de vous tous 💖",
+        "👑 Pour la gloire du Football 🌙⚽, je quitte ce groupe...\n💌 Prenez soin de vous tous et que le meilleur gagne ⚽✨",
         event.threadID
       );
 
+      // Retrait du bot après un délai
       setTimeout(() => {
         api.removeUserFromGroup(api.getCurrentUserID(), event.threadID);
       }, 500);
